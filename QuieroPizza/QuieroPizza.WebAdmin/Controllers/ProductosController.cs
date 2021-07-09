@@ -31,39 +31,17 @@ namespace QuieroPizza.WebAdmin.Controllers
             var nuevoProducto = new Producto();
             var categorias = _categoriasBL.ObtenerCategorias();
 
-            ViewBag.CategoriaId =
-                new SelectList(categorias, "Id", "Descripcion");
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion");
 
             return View(nuevoProducto);
         }
 
         [HttpPost]
-        public ActionResult Crear(Producto producto, HttpPostedFileBase imagen)
+        public ActionResult Crear(Producto producto)
         {
-            if (ModelState.IsValid)
-            {
-                if (producto.CategoriaId == 0)
-                {
-                    ModelState.AddModelError("CategoriaId", "Seleccione una cstegoria");
-                    return View(producto);
-                }
+            _productosBL.GuardarProducto(producto);
 
-                if (imagen != null)
-                {
-                    producto.UrlImagen = GuardarImagen(imagen);
-                }
-
-                _productosBL.GuardarProducto(producto);
-
-                return RedirectToAction("Index");
-            }
-
-            var categorias = _categoriasBL.ObtenerCategorias();
-
-            ViewBag.CategoriaId = 
-                new SelectList(categorias, "Id", "Descripcion");
-
-            return View(producto);
+            return RedirectToAction("Index");
         }
 
         public ActionResult Editar(int id)
@@ -79,25 +57,9 @@ namespace QuieroPizza.WebAdmin.Controllers
         [HttpPost]
         public ActionResult Editar(Producto producto)
         {
-            if (ModelState.IsValid)
-            {
-                if (producto.CategoriaId == 0)
-                {
-                    ModelState.AddModelError("CategoriaId", "Seleccione una cstegoria");
-                    return View(producto);
-                }
+            _productosBL.GuardarProducto(producto);
 
-                _productosBL.GuardarProducto(producto);
-
-                return RedirectToAction("Index");
-            }
-
-            var categorias = _categoriasBL.ObtenerCategorias();
-
-            ViewBag.CategoriaId =
-                new SelectList(categorias, "Id", "Descripcion");
-
-            return View(producto);
+            return RedirectToAction("Index");
         }
 
         public ActionResult Detalle(int id)
@@ -120,14 +82,6 @@ namespace QuieroPizza.WebAdmin.Controllers
             _productosBL.EliminarProducto(producto.Id);
 
             return RedirectToAction("Index");
-        }
-
-        private string GuardarImagen(HttpPostedFileBase imagen)
-        {
-            string path = Server.MapPath("~/Imagenes/" + imagen.FileName);
-            imagen.SaveAs(path);
-
-            return"/Imagenes/" + imagen.FileName
         }
     }
 }
